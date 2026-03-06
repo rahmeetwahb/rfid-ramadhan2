@@ -1,0 +1,13 @@
+{
+  "name": "rfid-ramadhan",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "googleapis": "^133.0.0",
+    "body-parser": "^1.20.2",
+    "dayjs": "^1.11.10"
+  }
+}
