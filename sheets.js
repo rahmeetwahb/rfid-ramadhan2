@@ -1,13 +1,21 @@
 import { google } from "googleapis"
 import dayjs from "dayjs"
 
-const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS)
+import { google } from "googleapis"
+
+let raw = process.env.GOOGLE_CREDENTIALS
+
+// hilangkan escape tambahan dari railway
+raw = raw.replace(/^"|"$/g, '')
+raw = raw.replace(/\\"/g, '"')
+
+const credentials = JSON.parse(raw)
 
 credentials.private_key = credentials.private_key.replace(/\\n/g, "\n")
 
 const auth = new google.auth.GoogleAuth({
-    credentials: credentials,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+  credentials: credentials,
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
 })
 
 const sheets = google.sheets({ version: "v4", auth })
