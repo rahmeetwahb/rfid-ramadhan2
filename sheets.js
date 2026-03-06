@@ -1,8 +1,12 @@
 import { google } from "googleapis"
 import dayjs from "dayjs"
 
+const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS)
+
+credentials.private_key = credentials.private_key.replace(/\\n/g, "\n")
+
 const auth = new google.auth.GoogleAuth({
-    credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
+    credentials: credentials,
     scopes: ["https://www.googleapis.com/auth/spreadsheets"]
 })
 
