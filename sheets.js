@@ -22,7 +22,7 @@ const SPREADSHEET_ID = process.env.SPREADSHEET_ID
 export async function getParticipant(uid) {
     const res = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
-        range: "peserta-ikhwan!A2:D100"
+        range: "peserta-akhwat!A2:D100"
     })
 
     const rows = res.data.values
@@ -43,7 +43,7 @@ export async function getParticipant(uid) {
 export async function saveAttendance(uid, name, session) {
     await sheets.spreadsheets.values.append({
         spreadsheetId: SPREADSHEET_ID,
-        range: "presensi-ikhwan!A2",
+        range: "presensi-akhwat!A2",
         valueInputOption: "RAW",
         requestBody: {
             values: [
@@ -61,7 +61,7 @@ export async function saveAttendance(uid, name, session) {
 export async function alreadyScannedSession(uid, session) {
     const res = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
-        range: "presensi-ikhwan!A2:D1000"
+        range: "presensi-akhwat!A2:D1000"
     })
 
     const rows = res.data.values || []
@@ -97,7 +97,7 @@ export async function getSessions() {
 export async function getLatestAttendance() {
     const res = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
-        range: "presensi-ikhwan!A2:D1000"
+        range: "presensi-akhwat!A2:D1000"
     })
 
     const rows = res.data.values || []
