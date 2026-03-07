@@ -1,3 +1,6 @@
-curl -X POST http://localhost:3000/scan \
+curl -X POST https://rfid-ramadhan-production.up.railway.app/scan \
 -H "Content-Type: application/json" \
 -d '{"uid":"1234"}'
+
+
+rfid-ramadhan-production.up.railway.app
