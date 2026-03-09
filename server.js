@@ -229,7 +229,7 @@ app.get("/tv", (req, res) => {
 
             document.body.style.background="red"
 
-            successSound.currentTime = 0
+            deniedSound.currentTime = 0
             deniedSound.play()
 
             nameEl.innerText = data.message
