@@ -156,7 +156,7 @@ res.send(`
     <head>
     <title>Attendance TV</title>
 
-        <style>
+    <style>
 
         body{
         background:#0f172a;
@@ -228,12 +228,28 @@ res.send(`
         background:#7f1d1d;
         }
 
-        </style>
+        #fullscreenBtn{
+        position:fixed;
+        top:10px;
+        right:10px;
+        padding:10px 20px;
+        font-size:16px;
+        background:#2563eb;
+        color:white;
+        border:none;
+        border-radius:6px;
+        cursor:pointer;
+        z-index:999;
+        }
+
+    </style>
 
     </head>
 
     <body>
-
+        <button id="fullscreenBtn" onclick="goFullscreen()">
+            Klik untuk Fullscreen
+        </button>
         <div class="header">
         📡 Sistem Absensi RFID
         </div>
@@ -332,6 +348,30 @@ res.send(`
         fetchLatest()
         updateClock()
 
+        function goFullscreen(){
+
+        const el = document.documentElement
+
+        if(el.requestFullscreen){
+        el.requestFullscreen()
+        }
+        else if(el.webkitRequestFullscreen){
+        el.webkitRequestFullscreen()
+        }
+        else if(el.msRequestFullscreen){
+        el.msRequestFullscreen()
+        }
+
+        document.getElementById("fullscreenBtn").style.display="none"
+
+        }
+        window.onload = () => {
+
+        setTimeout(()=>{
+        goFullscreen()
+        },1000)
+
+        }
         </script>
 
     </body>
