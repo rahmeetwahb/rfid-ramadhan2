@@ -20,6 +20,10 @@ dayjs.tz.setDefault("Asia/Jakarta")
 dotenv.config()
 const app = express()
 app.use(bodyParser.json())
+<<<<<<< HEAD
+=======
+app.use(express.static("public"))
+>>>>>>> f2a6a2a30efe37ddf70dd5c2511fce4c6b1e7a34
 
 // ==============================
 // CEK TANGGAL
@@ -186,6 +190,11 @@ app.get("/tv", (req, res) => {
         </head>
 
         <body>
+<<<<<<< HEAD
+=======
+        <audio id="successSound" src="/success.mp3"></audio>
+        <audio id="deniedSound" src="/denied.mp3"></audio>
+>>>>>>> f2a6a2a30efe37ddf70dd5c2511fce4c6b1e7a34
 
         <div class="name" id="name">Menunggu Scan...</div>
         <div class="session" id="session"></div>
@@ -202,6 +211,11 @@ app.get("/tv", (req, res) => {
 
             const nameEl = document.getElementById("name")
             const sessionEl = document.getElementById("session")
+<<<<<<< HEAD
+=======
+            const successSound = document.getElementById("successSound")
+            const deniedSound = document.getElementById("deniedSound")
+>>>>>>> f2a6a2a30efe37ddf70dd5c2511fce4c6b1e7a34
 
             // hanya update jika scan baru
             if(data.time !== lastEventTime){
@@ -212,6 +226,12 @@ app.get("/tv", (req, res) => {
 
             document.body.style.background="green"
 
+<<<<<<< HEAD
+=======
+            successSound.currentTime = 0
+            successSound.play()
+
+>>>>>>> f2a6a2a30efe37ddf70dd5c2511fce4c6b1e7a34
             nameEl.innerText = data.name
             sessionEl.innerText = "Session : " + data.session
 
@@ -221,6 +241,12 @@ app.get("/tv", (req, res) => {
 
             document.body.style.background="red"
 
+<<<<<<< HEAD
+=======
+            successSound.currentTime = 0
+            successSound.play()
+
+>>>>>>> f2a6a2a30efe37ddf70dd5c2511fce4c6b1e7a34
             nameEl.innerText = data.message
             sessionEl.innerText = ""
 
@@ -254,4 +280,8 @@ const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
     console.log("Server jalan di port", PORT)
+<<<<<<< HEAD
 })
+=======
+})
+>>>>>>> f2a6a2a30efe37ddf70dd5c2511fce4c6b1e7a34

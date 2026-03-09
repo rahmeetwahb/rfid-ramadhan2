@@ -1,0 +1,6 @@
+curl -X POST https://rfid-ramadhan-production.up.railway.app/scan \
+-H "Content-Type: application/json" \
+-d '{"uid":"B3711530"}'
+
+
+ikhwan = rfid-ramadhan-production.up.railway.app (/tv atau /scan)
