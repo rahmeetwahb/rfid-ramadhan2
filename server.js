@@ -151,113 +151,191 @@ app.get("/latest", (req, res) => {
 })
 
 app.get("/tv", (req, res) => {
-    res.send(`
-    <html>
-        <head>
-        <title>Attendance TV</title>
+res.send(`
+<html>
+    <head>
+    <title>Attendance TV</title>
 
         <style>
 
         body{
-        background:black;
+        background:#0f172a;
         color:white;
         text-align:center;
-        font-family:Arial;
-        margin-top:10%;
-        transition:0.5s;
+        font-family:Segoe UI,Arial;
+        margin:0;
+        display:flex;
+        flex-direction:column;
+        height:100vh;
+        transition:0.4s;
+        }
+
+        /* HEADER */
+
+        .header{
+        background:#020617;
+        padding:20px;
+        font-size:35px;
+        font-weight:bold;
+        letter-spacing:2px;
+        box-shadow:0 3px 10px rgba(0,0,0,0.5);
+        }
+
+        /* MAIN */
+
+        .main{
+        flex:1;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
         }
 
         .name{
-        font-size:70px;
+        font-size:80px;
         font-weight:bold;
+        margin-top:20px;
         }
 
         .session{
         font-size:40px;
-        margin-top:20px;
+        margin-top:10px;
+        opacity:0.9;
         }
 
         .time{
-        font-size:30px;
-        margin-top:20px;
+        font-size:35px;
+        margin-top:30px;
+        opacity:0.8;
+        }
+
+        /* FOOTER */
+
+        .footer{
+        background:#020617;
+        padding:15px;
+        font-size:20px;
+        opacity:0.8;
+        }
+
+        /* STATUS COLORS */
+
+        .success{
+        background:#14532d;
+        }
+
+        .denied{
+        background:#7f1d1d;
         }
 
         </style>
 
-        </head>
+    </head>
 
-        <body>
-        <audio id="successSound" src="/success.mp3"></audio>
-        <audio id="deniedSound" src="/denied.mp3"></audio>
+    <body>
+
+        <div class="header">
+        📡 Sistem Absensi RFID
+        </div>
+
+        <div class="main">
+
+        <audio id="successSound" src="/success.mp3" preload="auto"></audio>
+        <audio id="deniedSound" src="/denied.mp3" preload="auto"></audio>
 
         <div class="name" id="name">Menunggu Scan...</div>
         <div class="session" id="session"></div>
         <div class="time" id="time"></div>
 
+        </div>
+
+        <div class="footer">
+        Scan kartu RFID untuk melakukan absensi
+        </div>
+
         <script>
 
-            let lastEventTime = 0
+        let lastEventTime = 0
 
-            async function fetchLatest(){
+        function updateClock(){
 
-            const res = await fetch("/latest")
-            const data = await res.json()
+        const now = new Date()
 
-            const nameEl = document.getElementById("name")
-            const sessionEl = document.getElementById("session")
-            const successSound = document.getElementById("successSound")
-            const deniedSound = document.getElementById("deniedSound")
+        const time =
+        now.getHours().toString().padStart(2,"0") + ":" +
+        now.getMinutes().toString().padStart(2,"0") + ":" +
+        now.getSeconds().toString().padStart(2,"0")
 
-            // hanya update jika scan baru
-            if(data.time !== lastEventTime){
+        document.getElementById("time").innerText = time
 
-            lastEventTime = data.time
+        }
 
-            if(data.status === "SUCCESS"){
+        setInterval(updateClock,1000)
 
-            document.body.style.background="green"
+        async function fetchLatest(){
 
-            successSound.currentTime = 0
-            successSound.play()
+        const res = await fetch("/latest")
+        const data = await res.json()
 
-            nameEl.innerText = data.name
-            sessionEl.innerText = "Session : " + data.session
+        const nameEl = document.getElementById("name")
+        const sessionEl = document.getElementById("session")
 
-            }
+        const successSound = document.getElementById("successSound")
+        const deniedSound = document.getElementById("deniedSound")
 
-            else if(data.status === "DENIED"){
+        if(data.time !== lastEventTime){
 
-            document.body.style.background="red"
+        lastEventTime = data.time
 
-            deniedSound.currentTime = 0
-            deniedSound.play()
+        if(data.status === "SUCCESS"){
 
-            nameEl.innerText = data.message
-            sessionEl.innerText = ""
+        document.body.classList.remove("denied")
+        document.body.classList.add("success")
 
-            }
+        successSound.currentTime = 0
+        successSound.play()
 
-            // reset setelah 3 detik
-            setTimeout(()=>{
+        nameEl.innerText = data.name
+        sessionEl.innerText = "Session : " + data.session
 
-            document.body.style.background="black"
-            nameEl.innerText="Menunggu Scan..."
-            sessionEl.innerText=""
+        }
 
-            },3000)
+        else if(data.status === "DENIED"){
 
-            }
+        document.body.classList.remove("success")
+        document.body.classList.add("denied")
 
-            }
+        deniedSound.currentTime = 0
+        deniedSound.play()
 
-            setInterval(fetchLatest,1000)
+        nameEl.innerText = data.message
+        sessionEl.innerText = ""
 
-            fetchLatest()
+        }
+
+        setTimeout(()=>{
+
+        document.body.classList.remove("success")
+        document.body.classList.remove("denied")
+
+        nameEl.innerText="Menunggu Scan..."
+        sessionEl.innerText=""
+
+        },3000)
+
+        }
+
+        }
+
+        setInterval(fetchLatest,1000)
+
+        fetchLatest()
+        updateClock()
 
         </script>
 
-        </body>
-    </html>
+    </body>
+</html>
 `)
 })
 
