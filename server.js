@@ -251,7 +251,7 @@ res.send(`
             Klik untuk Fullscreen
         </button>
         <div class="header">
-        📡 Sistem Absensi RFID
+        📡 Sistem Presensi I'tikaf MABA
         </div>
 
         <div class="main">
@@ -266,7 +266,7 @@ res.send(`
         </div>
 
         <div class="footer">
-        Scan kartu RFID untuk melakukan absensi
+        Scan kartu untuk melakukan presensi I'tikaf
         </div>
 
         <script>
