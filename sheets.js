@@ -113,3 +113,71 @@ export async function getLatestAttendance() {
         session: last[3]
     }
 }
+
+export async function getParticipantList(){
+
+    const res = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: "peserta-akhwat!A2:D"
+    })
+
+    return res.data.values || []
+}
+
+export async function getAttendanceList(){
+
+    const res = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: "presensi-akhwat!A2:D"
+    })
+
+    return res.data.values || []
+}
+
+export async function getDashboardData() {
+
+    const pesertaRes = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: "peserta-akhwat!A2:D"
+    })
+
+    const presensiRes = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: "presensi-akhwat!A2:D"
+    })
+
+    const peserta = pesertaRes.data.values || []
+    const presensi = presensiRes.data.values || []
+
+    const today = dayjs().tz().format("YYYY-MM-DD")
+
+    const todayAttendance = presensi.filter(r => r[2]?.startsWith(today))
+
+    // ==========================
+    // HITUNG PER SESSION
+    // ==========================
+
+    const sessionStats = {}
+
+    todayAttendance.forEach(row => {
+
+        const session = row[3]
+
+        if (!sessionStats[session]) {
+            sessionStats[session] = 0
+        }
+
+        sessionStats[session]++
+
+    })
+
+    return {
+
+        totalPeserta: peserta.length,
+        totalHariIni: todayAttendance.length,
+        sessions: sessionStats,
+        last10: presensi.slice(-10).reverse()
+
+    }
+
+}

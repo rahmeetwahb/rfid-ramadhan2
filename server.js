@@ -2,15 +2,16 @@ import express from "express"
 import bodyParser from "body-parser"
 import dotenv from "dotenv"
 import { 
-    saveAttendance, 
-    getParticipant, 
-    alreadyScannedSession,
-    getSessions
+    saveAttendance,
+    getSessions,
+    getParticipantList,
+    getAttendanceList
 } from "./sheets.js"
+
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import timezone from "dayjs/plugin/timezone.js"
-import { getLatestAttendance } from "./sheets.js"
+import { getDashboardData } from "./sheets.js"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -21,6 +22,32 @@ dotenv.config()
 const app = express()
 app.use(bodyParser.json())
 app.use(express.static("public"))
+
+// ==============================
+// RAM CACHE (SUPER CEPAT)
+// ==============================
+
+let participantCache = []
+let attendanceCache = []
+let sessionCache = []
+
+// ==============================
+// LOAD DATA KE RAM
+// ==============================
+
+async function loadCache(){
+
+    participantCache = await getParticipantList()
+    attendanceCache = await getAttendanceList()
+    sessionCache = await getSessions()
+
+    console.log("CACHE LOADED")
+}
+
+loadCache()
+
+// reload cache tiap 5 menit
+setInterval(loadCache,300000)
 
 // ==============================
 // CEK TANGGAL
@@ -81,7 +108,24 @@ app.post("/scan", async (req, res) => {
             return res.json(lastScanResult)
         }
 
-        const participant = await getParticipant(uid)
+        const row = participantCache.find(r => r[0] === uid)
+
+        if (!row) {
+            lastScanResult = {
+                status: "DENIED",
+                name: "",
+                session: "",
+                message: "UID tidak terdaftar",
+                time: Date.now()
+            }
+            return res.json(lastScanResult)
+        }
+
+        const participant = {
+            name: row[1],
+            type: row[2],
+            dates: row[3]
+        }
 
         if (!participant) {
             lastScanResult = { status: "DENIED",name: "", session: "", message: "UID tidak terdaftar", time: Date.now() }
@@ -96,7 +140,7 @@ app.post("/scan", async (req, res) => {
         // ==============================
         // CEK JAM DARI SHEET
         // ==============================
-        const sessions = await getSessions()
+        const sessions = sessionCache
 
         let allowedTime = false
         let activeSession = ""
@@ -117,19 +161,37 @@ app.post("/scan", async (req, res) => {
             return res.json(lastScanResult)
         }
 
-        // 🔥 DOUBLE CHECK DI SINI SAJA
-        if (await alreadyScannedSession(uid, activeSession)) {
+        // CEK SUDAH ABSEN ATAU BELUM
+        // ==============================
+
+        const today = dayjs().tz().format("YYYY-MM-DD")
+
+        const already = attendanceCache.some(row =>
+            row[0] === uid &&
+            row[2].startsWith(today) &&
+            row[3] === activeSession
+        )
+
+        if (already) {
+
             lastScanResult = {
                 status: "DENIED",
-                name: "", 
+                name: "",
                 session: "",
                 message: "Sudah absen di session ini",
                 time: Date.now()
             }
+
             return res.json(lastScanResult)
         }
 
         await saveAttendance(uid, participant.name, activeSession)
+        attendanceCache.push([
+            uid,
+            participant.name,
+            dayjs().tz().format("YYYY-MM-DD HH:mm:ss"),
+            activeSession
+        ])
 
         lastScanResult = {
             status: "SUCCESS",
@@ -251,7 +313,7 @@ res.send(`
             Klik untuk Fullscreen
         </button>
         <div class="header">
-        📡 Sistem Presensi I'tikaf MABA
+        📡 Sistem Presensi I'tikaf Masjid MABA
         </div>
 
         <div class="main">
@@ -376,6 +438,239 @@ res.send(`
 
     </body>
 </html>
+`)
+})
+
+app.get("/api/dashboard",(req,res)=>{
+
+    const today = dayjs().tz().format("YYYY-MM-DD")
+
+    const todayAttendance = attendanceCache.filter(r =>
+        r[2].startsWith(today)
+    )
+
+    const sessionStats = {}
+
+    todayAttendance.forEach(r => {
+
+        const session = r[3]
+
+        if(!sessionStats[session]){
+            sessionStats[session] = 0
+        }
+
+        sessionStats[session]++
+
+    })
+
+    res.json({
+
+        totalPeserta: participantCache.length,
+        totalHariIni: todayAttendance.length,
+        sessions: sessionStats,
+        last10: attendanceCache.slice(-10).reverse()
+
+    })
+
+})
+
+app.get("/dashboard",(req,res)=>{
+
+res.send(`
+
+<html>
+
+<head>
+
+<title>Dashboard Presensi</title>
+
+<style>
+
+body{
+background:#0f172a;
+color:white;
+font-family:Segoe UI;
+margin:0;
+}
+
+.header{
+background:#020617;
+padding:20px;
+font-size:28px;
+font-weight:bold;
+}
+
+.container{
+padding:30px;
+}
+
+.cards{
+display:flex;
+gap:20px;
+margin-bottom:30px;
+}
+
+.card{
+flex:1;
+background:#1e293b;
+padding:25px;
+border-radius:10px;
+font-size:22px;
+text-align:center;
+}
+
+.sessionGrid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:20px;
+margin-bottom:40px;
+}
+
+.sessionCard{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+text-align:center;
+font-size:20px;
+}
+
+.table{
+width:100%;
+border-collapse:collapse;
+}
+
+.table th,.table td{
+padding:12px;
+border-bottom:1px solid #334155;
+}
+
+.table th{
+background:#020617;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+📊 Dashboard Presensi I'tikaf
+</div>
+
+<div class="container">
+
+<div class="cards">
+
+<div class="card">
+Total Peserta
+<br>
+<span id="totalPeserta">0</span>
+</div>
+
+<div class="card">
+Hadir Hari Ini
+<br>
+<span id="today">0</span>
+</div>
+
+</div>
+
+<h2>Presensi Per Session</h2>
+
+<div class="sessionGrid" id="sessionStats"></div>
+
+<h2>Presensi Terakhir</h2>
+
+<table class="table">
+
+<thead>
+
+<tr>
+<th>UID</th>
+<th>Nama</th>
+<th>Waktu</th>
+<th>Session</th>
+</tr>
+
+</thead>
+
+<tbody id="tableData"></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+async function loadDashboard(){
+
+const res = await fetch("/api/dashboard")
+const data = await res.json()
+
+document.getElementById("totalPeserta").innerText = data.totalPeserta
+document.getElementById("today").innerText = data.totalHariIni
+
+// =========================
+// SESSION STATS
+// =========================
+
+let sessionHTML = ""
+
+for(const s in data.sessions){
+
+sessionHTML += \`
+
+<div class="sessionCard">
+
+\${s}
+<br><br>
+<b>\${data.sessions[s]}</b>
+
+</div>
+
+\`
+
+}
+
+document.getElementById("sessionStats").innerHTML = sessionHTML
+
+// =========================
+// TABLE
+// =========================
+
+let table=""
+
+data.last10.forEach(row=>{
+
+table += \`
+
+<tr>
+<td>\${row[0]}</td>
+<td>\${row[1]}</td>
+<td>\${row[2]}</td>
+<td>\${row[3]}</td>
+</tr>
+
+\`
+
+})
+
+document.getElementById("tableData").innerHTML = table
+
+}
+
+// refresh tiap 2 detik
+setInterval(loadDashboard,2000)
+
+loadDashboard()
+
+</script>
+
+</body>
+
+</html>
+
 `)
 })
 
