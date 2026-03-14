@@ -249,13 +249,35 @@ res.send(`
 
         /* HEADER */
 
-        .header{
-        background:#020617;
-        padding:20px;
-        font-size:35px;
-        font-weight:bold;
-        letter-spacing:2px;
-        box-shadow:0 3px 10px rgba(0,0,0,0.5);
+        .header {
+        background: rgba(2, 6, 23, 0.05); 
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+
+        padding: 20px;
+        font-size: 35px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        position: relative; 
+        z-index: 10;
+        
+        box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+        }
+
+        .gradient{
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        background: linear-gradient(
+        to bottom, 
+        #c2a22e 0%,    /* Emas terang atas */
+        #ffffff 50%,   /* Putih tengah */
+        #946b03 100%   /* Emas gelap bawah */
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
         }
 
         /* MAIN */
@@ -276,9 +298,9 @@ res.send(`
         font-weight: bold;
         background: linear-gradient(
         to bottom, 
-        #f8e08d 0%,    /* Emas terang atas */
+        #c2a22e 0%,    /* Emas terang atas */
         #ffffff 50%,   /* Putih tengah */
-        #d4a017 100%   /* Emas gelap bawah */
+        #946b03 100%   /* Emas gelap bawah */
         );
         -webkit-background-clip: text;
         background-clip: text;
@@ -301,9 +323,26 @@ res.send(`
         font-weight: bold;
         background: linear-gradient(
         to bottom, 
-        #f8e08d 0%,    /* Emas terang atas */
+        #c2a22e 0%,    /* Emas terang atas */
         #ffffff 50%,   /* Putih tengah */
-        #d4a017 100%   /* Emas gelap bawah */
+        #946b03 100%   /* Emas gelap bawah */
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .hadits{
+        font-size: 10px
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        background: linear-gradient(
+        to bottom, 
+        #c2a22e 0%,    /* Emas terang atas */
+        #ffffff 50%,   /* Putih tengah */
+        #946b03 100%   /* Emas gelap bawah */
         );
         -webkit-background-clip: text;
         background-clip: text;
@@ -354,13 +393,17 @@ res.send(`
             Klik untuk Fullscreen
         </button>
         <div class="header">
-        📡 Sistem Presensi I'tikaf Masjid MABA
+        📡 Sistem Presensi <span class="gradient">I'tikaf Masjid MABA</span>
         </div>
 
         <div class="main">
 
         <audio id="successSound" src="/success.mp3" preload="auto"></audio>
         <audio id="deniedSound" src="/denied.mp3" preload="auto"></audio>
+
+        <div class="hadits">تَحَرَّوْا لَيْلَةَ الْقَدْرِ فِي الْعَشْرِ الأَوَاخِرِ مِنْ رَمَضَانَ</div>
+        <div class="hadits">‘Carilah Lailatul Qodar pada sepuluh malam terakhir pada bulan Ramadhan.’</div>
+        <div class="hadits">(HR. Bukhari dan Muslim)</div>
 
         <div class="name" id="name">Menunggu Scan...</div>
         <div class="session" id="session"></div>
