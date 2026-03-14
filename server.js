@@ -77,16 +77,18 @@ function isWithinTime(start, end) {
     end = String(end).replace(".", ":")
 
     const now = dayjs().tz()
+
     const nowMinutes = now.hour() * 60 + now.minute()
 
-    const [startHour, startMinute] = start.split(":").map(Number)
-    const [endHour, endMinute] = end.split(":").map(Number)
+    const startParts = start.split(":").map(Number)
+    const endParts = end.split(":").map(Number)
 
-    const startMinutes = startHour * 60 + startMinute
-    const endMinutes = endHour * 60 + endMinute
+    const startMinutes = startParts[0] * 60 + (startParts[1] || 0)
+    const endMinutes = endParts[0] * 60 + (endParts[1] || 0)
 
     return nowMinutes >= startMinutes && nowMinutes <= endMinutes
 }
+
 
 let lastScanResult = {
     status: "IDLE",
