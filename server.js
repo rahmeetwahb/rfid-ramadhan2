@@ -216,12 +216,16 @@ app.get("/tv", (req, res) => {
 res.send(`
 <html>
     <head>
-    <title>Attendance TV</title>
+    <title>PRESENSI I'TIKAF PUTRI</title>
 
     <style>
 
         body{
-        background:#0f172a;
+        background-image:url("/bg.png");
+        background-size:cover;
+        background-position:center;
+        background-repeat:no-repeat;
+
         color:white;
         text-align:center;
         font-family:Segoe UI,Arial;
@@ -230,6 +234,17 @@ res.send(`
         flex-direction:column;
         height:100vh;
         transition:0.4s;
+        }
+
+        body::before{
+        content:"";
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.55);
+        z-index:-1;
         }
 
         /* HEADER */
@@ -257,6 +272,19 @@ res.send(`
         font-size:80px;
         font-weight:bold;
         margin-top:20px;
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        background: linear-gradient(
+        to bottom, 
+        #f8e08d 0%,    /* Emas terang atas */
+        #ffffff 50%,   /* Putih tengah */
+        #d4a017 100%   /* Emas gelap bawah */
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
         }
 
         .session{
@@ -269,6 +297,19 @@ res.send(`
         font-size:35px;
         margin-top:30px;
         opacity:0.8;
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        background: linear-gradient(
+        to bottom, 
+        #f8e08d 0%,    /* Emas terang atas */
+        #ffffff 50%,   /* Putih tengah */
+        #d4a017 100%   /* Emas gelap bawah */
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
         }
 
         /* FOOTER */
